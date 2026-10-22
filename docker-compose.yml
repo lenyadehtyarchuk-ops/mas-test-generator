@@ -1,0 +1,144 @@
+services:
+  # ==========================================
+  # 1. Центральный Координатор (Orchestrator)
+  # ==========================================
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    container_name: mas-orchestrator
+    ports:
+      - "8000:8000"  # Единственный порт, открытый наружу для пользователя
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+      - ANALYST_URL=http://agent-analyst:8001
+      - GENERATOR_URL=http://agent-generator:8002
+      - DEBUGGER_URL=http://agent-debugger:8003
+      - PYTHON_RUNNER_URL=http://runner-python:8004
+      - JAVA_RUNNER_URL=http://runner-java:8005
+    volumes:
+      - ./common:/app/common:ro
+    depends_on:
+      - agent-analyst
+      - agent-generator
+      - agent-debugger
+      - runner-python
+      - runner-java
+    networks:
+      - mas-internal-net
+      - sandbox-isolated-net
+    restart: unless-stopped
+
+  # ==========================================
+  # 2. Интеллектуальные агенты (LLM Services)
+  # ==========================================
+  agent-analyst:
+    build:
+      context: .
+      dockerfile: agents/analyst/Dockerfile
+    container_name: mas-agent-analyst
+    expose:
+      - "8001"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./common:/app/common:ro
+    networks:
+      - mas-internal-net
+    restart: unless-stopped
+
+  agent-generator:
+    build:
+      context: .
+      dockerfile: agents/generator/Dockerfile
+    container_name: mas-agent-generator
+    expose:
+      - "8002"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./common:/app/common:ro
+    networks:
+      - mas-internal-net
+    restart: unless-stopped
+
+  agent-debugger:
+    build:
+      context: .
+      dockerfile: agents/debugger/Dockerfile
+    container_name: mas-agent-debugger
+    expose:
+      - "8003"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./common:/app/common:ro
+    networks:
+      - mas-internal-net
+    restart: unless-stopped
+
+  # ==========================================
+  # 3. Изолированные среды исполнения (Runners)
+  # ==========================================
+  runner-python:
+    build:
+      context: .
+      dockerfile: runners/python_runner/Dockerfile
+    container_name: mas-runner-python
+    expose:
+      - "8004"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./common:/app/common:ro
+    # Tmpfs в оперативной памяти для быстрого и безопасного создания временных файлов
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+    networks:
+      - sandbox-isolated-net
+    restart: unless-stopped
+
+  runner-java:
+    build:
+      context: .
+      dockerfile: runners/java_runner/Dockerfile
+    container_name: mas-runner-java
+    expose:
+      - "8005"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./common:/app/common:ro
+    tmpfs:
+      - /tmp:size=128M,mode=1777
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+    networks:
+      - sandbox-isolated-net
+    restart: unless-stopped
+
+# ==========================================
+# Сети (Разделение доступа к интернету)
+# ==========================================
+networks:
+  mas-internal-net:
+    driver: bridge
+  sandbox-isolated-net:
+    driver: bridge
+    internal: true  # Блокирует любой внешний сетевой трафик из контейнеров-раннеров
