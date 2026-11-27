@@ -1,0 +1,6 @@
+{
+  "language": "python",
+  "source_code": "def add(a, b):\n    return a + b\n",
+  "nl_description": "Функция add(a, b) возвращает сумму двух целых чисел. Поддерживает ноль и отрицательные числа.",
+  "max_iterations": 3
+}

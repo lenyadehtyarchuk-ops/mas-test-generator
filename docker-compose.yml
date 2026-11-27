@@ -1,0 +1,126 @@
+name: mas-test-generator
+
+x-service: &service
+  init: true
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  volumes: ["./common:/app/common:ro"]
+
+x-health: &health
+  interval: 10s
+  timeout: 3s
+  retries: 6
+  start_period: 20s
+
+x-llm-env: &llm-env
+  PYTHONPATH: /app
+  LLM_API_KEY: ${LLM_API_KEY:-ollama}
+  LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
+  LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+  LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.1}
+  LLM_OUTPUT_MODE: ${LLM_OUTPUT_MODE:-auto}
+  LLM_TIMEOUT: ${LLM_TIMEOUT:-90}
+
+services:
+  orchestrator:
+    <<: *service
+    build: {context: ., dockerfile: orchestrator/Dockerfile}
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      PYTHONPATH: /app
+      ANALYST_URL: http://agent-analyst:8001
+      GENERATOR_URL: http://agent-generator:8002
+      DEBUGGER_URL: http://agent-debugger:8003
+      PYTHON_RUNNER_URL: http://runner-python:8004
+      JAVA_RUNNER_URL: http://runner-java:8005
+      AGENT_HTTP_TIMEOUT: ${AGENT_HTTP_TIMEOUT:-240}
+      RUNNER_EXECUTION_TIMEOUT: ${RUNNER_EXECUTION_TIMEOUT:-10}
+    depends_on:
+      agent-analyst: {condition: service_healthy}
+      agent-generator: {condition: service_healthy}
+      agent-debugger: {condition: service_healthy}
+      runner-python: {condition: service_healthy}
+      runner-java: {condition: service_healthy}
+    tmpfs: ["/tmp:size=16M,mode=1777"]
+    networks: [mas-internal-net, sandbox-isolated-net]
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+    mem_limit: 256m
+    pids_limit: 64
+
+  agent-analyst:
+    <<: *service
+    build: {context: ., dockerfile: agents/analyst/Dockerfile}
+    expose: ["8001"]
+    environment: *llm-env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [mas-internal-net]
+    tmpfs: ["/tmp:size=16M,mode=1777"]
+    mem_limit: 256m
+    pids_limit: 64
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+
+  agent-generator:
+    <<: *service
+    build: {context: ., dockerfile: agents/generator/Dockerfile}
+    expose: ["8002"]
+    environment: *llm-env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [mas-internal-net]
+    tmpfs: ["/tmp:size=16M,mode=1777"]
+    mem_limit: 256m
+    pids_limit: 64
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')"]
+
+  agent-debugger:
+    <<: *service
+    build: {context: ., dockerfile: agents/debugger/Dockerfile}
+    expose: ["8003"]
+    environment: *llm-env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [mas-internal-net]
+    tmpfs: ["/tmp:size=16M,mode=1777"]
+    mem_limit: 256m
+    pids_limit: 64
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/health')"]
+
+  runner-python:
+    <<: *service
+    build: {context: ., dockerfile: runners/python_runner/Dockerfile}
+    expose: ["8004"]
+    environment: {PYTHONPATH: /app}
+    tmpfs: ["/tmp:size=64M,mode=1777"]
+    networks: [sandbox-isolated-net]
+    cpus: 0.50
+    mem_limit: 256m
+    pids_limit: 64
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8004/health')"]
+
+  runner-java:
+    <<: *service
+    build: {context: ., dockerfile: runners/java_runner/Dockerfile}
+    expose: ["8005"]
+    environment: {PYTHONPATH: /app}
+    tmpfs: ["/tmp:size=128M,mode=1777"]
+    networks: [sandbox-isolated-net]
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 96
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8005/health'))['status']=='ok'"]
+
+networks:
+  mas-internal-net: {driver: bridge}
+  sandbox-isolated-net: {driver: bridge, internal: true}

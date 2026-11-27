@@ -1,0 +1,46 @@
+test_agent_contracts_with_fake_llm (test_api.ApiTests.test_agent_contracts_with_fake_llm) ... skipped 'FastAPI required for ASGI endpoint tests'
+test_health_and_bad_task (test_api.ApiTests.test_health_and_bad_task) ... skipped 'FastAPI required for ASGI endpoint tests'
+test_bad_language_and_limits (test_contracts.ContractTests.test_bad_language_and_limits) ... ok
+test_empty_specification_rejected (test_contracts.ContractTests.test_empty_specification_rejected) ... ok
+test_timeout_limits (test_contracts.ContractTests.test_timeout_limits) ... ok
+test_verdict_requires_evidence (test_contracts.ContractTests.test_verdict_requires_evidence) ... ok
+test_authentication_never_retried_as_json (test_llm.LLMTests.test_authentication_never_retried_as_json) ... ok
+test_format_error_falls_back (test_llm.LLMTests.test_format_error_falls_back) ... ok
+test_invalid_schema_rejected (test_llm.LLMTests.test_invalid_schema_rejected) ... ok
+test_native_parsed_object (test_llm.LLMTests.test_native_parsed_object) ... ok
+test_prompt_mode_has_no_response_format (test_llm.LLMTests.test_prompt_mode_has_no_response_format) ... ok
+test_exhaustion (test_pipeline.PipelineTests.test_exhaustion) ... ok
+test_failed_fix_never_claims_success (test_pipeline.PipelineTests.test_failed_fix_never_claims_success) ... ok
+test_fake_pass_rejected (test_pipeline.PipelineTests.test_fake_pass_rejected) ... ok
+test_fix_is_executed (test_pipeline.PipelineTests.test_fix_is_executed) ... ok
+test_invalid_upstream_is_502 (test_pipeline.PipelineTests.test_invalid_upstream_is_502) ... ok
+test_java_route (test_pipeline.PipelineTests.test_java_route) ... ok
+test_semantic_feedback (test_pipeline.PipelineTests.test_semantic_feedback) ... ok
+test_source_syntax_not_blames_generator (test_pipeline.PipelineTests.test_source_syntax_not_blames_generator) ... ok
+test_success (test_pipeline.PipelineTests.test_success) ... ok
+test_technical_feedback_without_debugger (test_pipeline.PipelineTests.test_technical_feedback_without_debugger) ... ok
+test_transport_errors (test_pipeline.PipelineTests.test_transport_errors) ... ok
+test_all_skipped_never_pass (test_runner_support.RunnerSupportTests.test_all_skipped_never_pass) ... ok
+test_entity_report_rejected (test_runner_support.RunnerSupportTests.test_entity_report_rejected) ... ok
+test_output_limit (test_runner_support.RunnerSupportTests.test_output_limit) ... ok
+test_process_success_and_environment (test_runner_support.RunnerSupportTests.test_process_success_and_environment) ... ok
+test_timeout (test_runner_support.RunnerSupportTests.test_timeout) ... ok
+test_xml_counts (test_runner_support.RunnerSupportTests.test_xml_counts) ... ok
+test_zero_tests_never_pass (test_runner_support.RunnerSupportTests.test_zero_tests_never_pass) ... ok
+test_no_tests (test_runners.JavaRunnerTests.test_no_tests) ... skipped 'JDK 17 and JUNIT_JAR required (available in runner-java image)'
+test_pass_and_failure (test_runners.JavaRunnerTests.test_pass_and_failure) ... skipped 'JDK 17 and JUNIT_JAR required (available in runner-java image)'
+test_source_compilation_error (test_runners.JavaRunnerTests.test_source_compilation_error) ... skipped 'JDK 17 and JUNIT_JAR required (available in runner-java image)'
+test_test_compilation_error (test_runners.JavaRunnerTests.test_test_compilation_error) ... skipped 'JDK 17 and JUNIT_JAR required (available in runner-java image)'
+test_timeout (test_runners.JavaRunnerTests.test_timeout) ... skipped 'JDK 17 and JUNIT_JAR required (available in runner-java image)'
+test_no_tests (test_runners.PythonRunnerTests.test_no_tests) ... skipped 'pytest must be installed for real Python execution'
+test_pass_and_failure_counts (test_runners.PythonRunnerTests.test_pass_and_failure_counts) ... skipped 'pytest must be installed for real Python execution'
+test_timeout (test_runners.PythonRunnerTests.test_timeout) ... skipped 'pytest must be installed for real Python execution'
+test_bad_source (test_runners.PythonSyntaxTests.test_bad_source) ... ok
+test_bad_tests (test_runners.PythonSyntaxTests.test_bad_tests) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.584s
+
+OK (skipped=10)
+
+Collected: 39; testsRun: 29; skipped: 10; failures: 0; errors: 0

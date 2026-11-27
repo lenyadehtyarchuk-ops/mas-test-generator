@@ -1,0 +1,110 @@
+# ==========================================
+# 1. Секреты и переменные окружения (КРИТИЧНО)
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# 2. Python (Orchestrator, Agents, Python Runner)
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Виртуальные окружения
+venv/
+.venv/
+env/
+ENV/
+
+# Кэш тестирования и покрытия (pytest, coverage, mypy, ruff)
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# Сборка пакетов (если common оформлен как пакет)
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==========================================
+# 3. Java (Java Runner & JUnit Sandbox)
+# ==========================================
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+
+# Артефакты сборки Maven / Gradle
+target/
+build/
+.gradle/
+dependency-reduced-pom.xml
+
+# Загружаемые standalone-библиотеки (если скачиваются при сборке образа, а не хранятся в git)
+*.jar
+*.war
+*.nar
+*.ear
+# Раскомментируй строку ниже, если решишь хранить junit-standalone.jar прямо в репозитории:
+# !runners/java_runner/lib/*.jar
+
+# ==========================================
+# 4. Временные файлы песочниц (Sandbox Runners)
+# ==========================================
+# Директории, куда раннеры сохраняют сгенерированный код и тесты при локальном запуске
+tmp/
+temp/
+sandbox_runs/
+run_*/
+workspace/
+
+# Отчеты и логи прогонов
+logs/
+*.log
+reports/
+
+# ==========================================
+# 5. Docker
+# ==========================================
+# Локальные переопределения композа и дампы томов
+docker-compose.override.yml
+.docker/
+volumes/
+data/
+
+# ==========================================
+# 6. IDE и редакторы кода (VS Code, PyCharm / IntelliJ)
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ==========================================
+# 7. Системные файлы ОС (Linux / macOS / Windows)
+# ==========================================
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+# Local validation and update backups
+.mas-backups/
+outputs/
